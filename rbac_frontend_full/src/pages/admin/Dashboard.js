@@ -1,11 +1,9 @@
-
 import DashboardLayout from "../../layouts/DashboardLayout";
-import { Typography } from "@mui/material";
 
 export default function AdminDashboard() {
   return (
     <DashboardLayout>
-      <Typography variant="h4">Admin Dashboard</Typography>
+      <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
     </DashboardLayout>
   );
 }

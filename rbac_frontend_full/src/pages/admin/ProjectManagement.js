@@ -1,27 +1,17 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Paper,
   Table,
-  TableHead,
-  TableRow,
-  TableCell,
   TableBody,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Autocomplete,
-  Chip,
-  MenuItem,
-  Avatar,
-} from "@mui/material";
-import { Edit } from "@mui/icons-material";
-import DeleteIcon from "@mui/icons-material/Delete";
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Edit, Trash2, UserPlus, X } from "lucide-react";
 import API from "../../api/axios";
 
 export default function ProjectManagement() {
@@ -39,6 +29,8 @@ export default function ProjectManagement() {
   const [roleOpen, setRoleOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+  
+  const navigate = useNavigate();
 
   const fetchProjects = async () => {
     const res = await API.get("projects/");
@@ -97,7 +89,7 @@ export default function ProjectManagement() {
   const assignUserToProject = async () => {
     await API.post("assign-user/", {
       project_id: selectedProject.id,
-      user_ids: selectedUsers.map((u) => u.id),
+      user_ids: selectedUsers,
     });
 
     setAssignOpen(false);
@@ -123,47 +115,37 @@ export default function ProjectManagement() {
     fetchProjects();
   };
 
+  const handleUserSelect = (e) => {
+    const options = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectedUsers(options);
+  };
+
   return (
-    <Box sx={{ p: 4, display: "flex", justifyContent: "center" }}>
-      <Paper sx={{ width: "100%", maxWidth: 1300, p: 4, borderRadius: 4 }}>
-        <Typography variant="h5" fontWeight="bold" mb={3}>
-          Project Management
-        </Typography>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold tracking-tight">Project Management</h2>
+      </div>
 
-        <TextField
-          fullWidth
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ mb: 3 }}
-        />
+      <Input
+        placeholder="Search..."
+        className="max-w-md"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableCell>
-                <b>Image</b>
-              </TableCell>
-              <TableCell>
-                <b>Project</b>
-              </TableCell>
-              <TableCell>
-                <b>Users</b>
-              </TableCell>
-              <TableCell>
-                <b>Description</b>
-              </TableCell>
-              <TableCell>
-                <b>Start</b>
-              </TableCell>
-              <TableCell>
-                <b>End</b>
-              </TableCell>
-              <TableCell>
-                <b>Actions</b>
-              </TableCell>
+              <TableHead className="font-bold">Image</TableHead>
+              <TableHead className="font-bold">Project</TableHead>
+              <TableHead className="font-bold">Users</TableHead>
+              <TableHead className="font-bold">Description</TableHead>
+              <TableHead className="font-bold">Start</TableHead>
+              <TableHead className="font-bold">End</TableHead>
+              <TableHead className="font-bold text-right">Actions</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
 
           <TableBody>
             {data
@@ -171,179 +153,214 @@ export default function ProjectManagement() {
                 d.project_name?.toLowerCase().includes(search.toLowerCase()),
               )
               .map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell sx={{ width: 100 }}>
-                    <Box
-                      component="label"
-                      sx={{
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        width: 60,
-                        height: 60,
-                        overflow: "hidden",
-                      }}
+                <TableRow 
+                  key={row.id}
+                  onClick={() => navigate(`/viewer/${row.id}`)}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                >
+                  <TableCell>
+                    <label
+                      onClick={(e) => e.stopPropagation()}
+                      className="cursor-pointer inline-flex items-center justify-center w-12 h-12 rounded-md bg-muted border-2 border-dashed border-muted-foreground/25 overflow-hidden"
                     >
-                      <Avatar
-                        src={row.image || ""}
-                        variant="rounded"
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          bgcolor: "#f0f0f0",
-                          border: "2px dashed #ccc",
-                          pointerEvents: "none",
-                        }}
-                      >
-                        {!row.image && "+"}
-                      </Avatar>
-
+                      {row.image ? (
+                        <img src={row.image} alt={row.project_name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-muted-foreground">+</span>
+                      )}
                       <input
                         hidden
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleImageUpload(e, row.id)}
                       />
-                    </Box>
+                    </label>
                   </TableCell>
 
-                  <TableCell>{row.project_name}</TableCell>
+                  <TableCell className="font-medium">{row.project_name}</TableCell>
 
                   <TableCell>
+                    <div className="flex flex-wrap gap-1">
                     {row.users?.length > 0
                       ? row.users.map((u) => (
-                          <Chip
+                          <div
                             key={u.id}
-                            label={u.username}
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedUser(u);
                               setNewRole(u.sub_role || "");
                               setRoleOpen(true);
                             }}
-                            onDelete={() => {
-                              if (window.confirm("Remove user?")) {
-                                removeUserFromProject(row.id, u.id);
-                              }
-                            }}
-                            sx={{ mr: 1, mb: 1, cursor: "pointer" }}
-                          />
+                            className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary/80"
+                          >
+                            <span>{u.username}</span>
+                            <div
+                              role="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (window.confirm("Remove user?")) {
+                                  removeUserFromProject(row.id, u.id);
+                                }
+                              }}
+                              className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </div>
+                          </div>
                         ))
-                      : "-"}
+                      : <span className="text-muted-foreground">-</span>}
+                    </div>
                   </TableCell>
 
-                  <TableCell>{row.description}</TableCell>
+                  <TableCell className="max-w-[150px] truncate">{row.description}</TableCell>
                   <TableCell>{row.start}</TableCell>
                   <TableCell>{row.end}</TableCell>
 
-                  <TableCell>
-                    <IconButton
-                      onClick={() => {
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button
+                      variant="ghost" 
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setEditData(row);
                         setEditOpen(true);
                       }}
+                      title="Edit Project"
                     >
-                      <Edit />
-                    </IconButton>
+                      <Edit className="w-4 h-4" />
+                    </Button>
 
-                    <IconButton
-                      onClick={() => {
+                    <Button
+                      variant="ghost" 
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setSelectedProject(row);
                         setAssignOpen(true);
                       }}
-                      sx={{ color: "#2e7d32" }}
+                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      title="Assign User"
                     >
-                      ➕
-                    </IconButton>
+                      <UserPlus className="w-4 h-4" />
+                    </Button>
 
-                    <IconButton onClick={() => deleteProject(row.id)}>
-                      <DeleteIcon />
-                    </IconButton>
+                    <Button
+                      variant="ghost" 
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteProject(row.id);
+                      }} 
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      title="Delete Project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
+              {data.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
           </TableBody>
         </Table>
+      </div>
 
-        {/* EDIT MODAL */}
-        <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth>
-          <DialogTitle>Edit Project</DialogTitle>
-          <DialogContent>
-            <TextField
-              fullWidth
-              label="Project Name"
-              value={editData?.project_name || ""}
-              onChange={(e) =>
-                setEditData({
-                  ...editData,
-                  project_name: e.target.value,
-                })
-              }
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setEditOpen(false)}>Cancel</Button>
+      {/* EDIT MODAL */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Project Name</label>
+              <Input
+                value={editData?.project_name || ""}
+                onChange={(e) =>
+                  setEditData({
+                    ...editData,
+                    project_name: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
             <Button onClick={updateProject}>Update</Button>
-          </DialogActions>
-        </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        {/* ASSIGN USER MODAL */}
-        <Dialog
-          open={assignOpen}
-          onClose={() => setAssignOpen(false)}
-          fullWidth
-        >
-          <DialogTitle>Assign Users</DialogTitle>
-          <DialogContent>
-            <Typography mb={2}>
-              Project: <b>{selectedProject?.project_name}</b>
-            </Typography>
+      {/* ASSIGN USER MODAL */}
+      <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assign Users</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-sm">
+              Project: <span className="font-bold">{selectedProject?.project_name}</span>
+            </p>
 
-            <Autocomplete
-              multiple
-              options={users}
-              getOptionLabel={(option) =>
-                `${option.username} - ${option.sub_role || "No Role"}`
-              }
-              value={selectedUsers}
-              onChange={(e, val) => setSelectedUsers(val)}
-              renderInput={(params) => (
-                <TextField {...params} label="Select Users" />
-              )}
-            />
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={() => setAssignOpen(false)}>Cancel</Button>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Users (Hold Ctrl/Cmd to select multiple)</label>
+              <select 
+                multiple
+                value={selectedUsers}
+                onChange={handleUserSelect}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[150px]"
+              >
+                {users.map((user) => (
+                  <option key={user.id} value={user.id} className="py-1">
+                    {user.username} - {user.sub_role || "No Role"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAssignOpen(false)}>Cancel</Button>
             <Button onClick={assignUserToProject}>Assign</Button>
-          </DialogActions>
-        </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        {/* ROLE MODAL */}
-        <Dialog open={roleOpen} onClose={() => setRoleOpen(false)} fullWidth>
-          <DialogTitle>Change Role</DialogTitle>
-          <DialogContent>
-            <Typography mb={2}>
-              User: <b>{selectedUser?.username}</b>
-            </Typography>
+      {/* ROLE MODAL */}
+      <Dialog open={roleOpen} onOpenChange={setRoleOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Role</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-sm">
+              User: <span className="font-bold">{selectedUser?.username}</span>
+            </p>
 
-            <TextField
-              select
-              fullWidth
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value)}
-            >
-              <MenuItem value="project_manager">Project Manager</MenuItem>
-              <MenuItem value="project_engineer">Project Engineer</MenuItem>
-              <MenuItem value="data_contributor">Data Contributor</MenuItem>
-            </TextField>
-          </DialogContent>
-
-          <DialogActions>
-            <Button onClick={() => setRoleOpen(false)}>Cancel</Button>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Role</label>
+              <select
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="project_manager">Project Manager</option>
+                <option value="project_engineer">Project Engineer</option>
+                <option value="data_contributor">Data Contributor</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleOpen(false)}>Cancel</Button>
             <Button onClick={updateUserRole}>Update</Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
-    </Box>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

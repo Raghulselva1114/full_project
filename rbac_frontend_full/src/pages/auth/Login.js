@@ -1,18 +1,11 @@
 import { useState } from "react";
 import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Card,
-  CardContent,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const [form, setForm] = useState({});
@@ -28,23 +21,18 @@ export default function Login() {
 
       console.log("LOGIN RESPONSE:", res.data);
 
-      // ✅ store token
       localStorage.setItem("token", res.data.access);
 
-      // ✅ role only
       const role = (res.data.sub_role || res.data.role)?.toLowerCase();
 
       console.log("ROLE:", role);
 
       localStorage.setItem("role", role);
 
-      // 🔥 ROLE BASED REDIRECT (FINAL)
       const roleRoutes = {
         superadmin: "/superadmin",
         admin: "/admin/projects",
         member: "/member/dashboard",
-
-        // 👇 your required dashboards
         project_manager: "/manager",
         project_engineer: "/engineer",
         data_contributor: "/data",
@@ -55,7 +43,6 @@ export default function Login() {
         return;
       }
 
-      // special check for superadmin
       if (role === "superadmin") {
         const check = await API.get("check-admin/");
 
@@ -67,7 +54,6 @@ export default function Login() {
         return;
       }
 
-      // ✅ navigate based on role
       navigate(roleRoutes[role]);
     } catch (err) {
       console.log("ERROR:", err.response?.data);
@@ -82,69 +68,58 @@ export default function Login() {
   };
 
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        background: "linear-gradient(135deg, #667eea, #764ba2)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Card sx={{ width: 380, borderRadius: 4, boxShadow: 6 }}>
-        <CardContent>
-          <Typography variant="h5" textAlign="center" mb={2}>
-            🔐 Login
-          </Typography>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <Card className="w-full max-w-sm shadow-lg border-0">
+        <CardContent className="pt-6">
+          <h2 className="text-2xl font-semibold text-center mb-6">🔐 Login</h2>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
 
-          <TextField
-            fullWidth
-            label="Username"
-            margin="normal"
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-          />
-
-          <TextField
-            fullWidth
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            margin="normal"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{ mt: 2, borderRadius: 2, py: 1 }}
-            onClick={login}
-          >
-            Login
-          </Button>
-
-          <Typography mt={2} textAlign="center">
-            Don't have an account?{" "}
-            <span
-              style={{
-                color: "#667eea",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-              onClick={() => navigate("/signup")}
+            <Button
+              className="w-full"
+              onClick={login}
             >
-              Signup
-            </span>
-          </Typography>
+              Login
+            </Button>
+
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                className="text-primary hover:underline font-medium"
+                onClick={() => navigate("/signup")}
+              >
+                Signup
+              </button>
+            </p>
+          </div>
         </CardContent>
       </Card>
-    </Box>
+    </div>
   );
 }

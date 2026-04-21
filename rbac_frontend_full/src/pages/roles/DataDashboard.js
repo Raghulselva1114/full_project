@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, Card, CardMedia, Typography, Button } from "@mui/material";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import API from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 
@@ -21,67 +22,40 @@ export default function ProjectCardsPreview() {
   }, []);
 
   return (
-    <Box
-      sx={{
-        p: 4,
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-      }}
-    >
-      <Grid container spacing={4}>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold tracking-tight">Data Dashboard</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <Grid item xs={12} sm={6} md={4} key={project.id}>
-            <Card
-              sx={{
-                p: 2,
-                borderRadius: "18px",
-                boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
-                transition: "0.3s",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: "0 12px 25px rgba(0,0,0,0.15)",
-                },
-              }}
-            >
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                mb={2}
-                textAlign="center"
-              >
-                {project.project_name}
-              </Typography>
-
-              <CardMedia
-                component="img"
-                image={
-                  project.image ||
-                  "https://via.placeholder.com/400x250?text=No+Image"
-                }
-                alt={project.project_name}
-                sx={{
-                  height: 220,
-                  borderRadius: "12px",
-                  objectFit: "cover",
-                  mb: 2,
-                }}
-              />
-
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={() =>
-                  navigate(`/project-details/${project.id}`, {
-                    state: { projectName: project.project_name },
-                  })
-                }
-              >
-                Update Data
-              </Button>
-            </Card>
-          </Grid>
+          <Card key={project.id} className="overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1 block">
+            <CardContent className="p-0">
+              <div className="p-4 border-b">
+                <h3 className="text-xl font-bold text-center capitalize">{project.project_name}</h3>
+              </div>
+              <div className="p-4">
+                <img 
+                  src={project.image || "https://via.placeholder.com/400x250?text=No+Image"} 
+                  alt={project.project_name} 
+                  className="w-full h-[220px] object-cover rounded-xl"
+                />
+              </div>
+              <div className="px-4 pb-4">
+                <Button 
+                  className="w-full py-6 text-base" 
+                  onClick={() =>
+                    navigate(`/project-details/${project.id}`, {
+                      state: { projectName: project.project_name },
+                    })
+                  }
+                >
+                  Update Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }
