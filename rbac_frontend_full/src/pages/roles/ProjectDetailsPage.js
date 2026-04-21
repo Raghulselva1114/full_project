@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Card,
-  Typography,
-  Button,
-  TextField,
-  IconButton,
-  Stack,
-  Paper,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SaveIcon from "@mui/icons-material/Save";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import EditIcon from "@mui/icons-material/Edit";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Trash2, Save, Upload, Edit2 } from "lucide-react";
 import { useLocation, useParams } from "react-router-dom";
 import API from "../../api/axios";
 
@@ -163,217 +152,137 @@ export default function ProjectDetailsPage() {
 
   const renderRows = (rows, type) =>
     rows.map((row, i) => (
-      <Paper
+      <div
         key={row.id}
-        component={motion.div}
-        whileHover={{ scale: 1.015 }}
-        sx={{
-          p: 2.5,
-          mb: 2.5,
-          borderRadius: "24px",
-          background: "linear-gradient(145deg,#ffffff,#edf4ff)",
-          boxShadow:
-            "8px 8px 20px rgba(0,0,0,0.08), -6px -6px 18px rgba(255,255,255,0.9)",
-          border: "1px solid rgba(255,255,255,0.65)",
-        }}
+        className="flex flex-col md:flex-row gap-4 items-center p-4 mb-4 rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all"
       >
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={2}
-          alignItems="center"
-        >
-          <Typography
-            sx={{
-              minWidth: 35,
-              fontWeight: 700,
-              color: "#1976d2",
-              fontSize: "18px",
-            }}
-          >
-            {i + 1}
-          </Typography>
+        <div className="font-bold text-primary text-lg w-8 text-center bg-primary/10 rounded-full h-8 flex items-center justify-center shrink-0">
+          {i + 1}
+        </div>
 
-          <TextField
-            fullWidth
-            disabled={!row.editable}
-            value={row.description}
-            onChange={(e) =>
-              updateRow(type, row.id, "description", e.target.value)
-            }
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "16px",
-                background: "#fff",
-              },
-            }}
-          />
+        <Input
+          className="flex-1"
+          disabled={!row.editable}
+          value={row.description}
+          onChange={(e) =>
+            updateRow(type, row.id, "description", e.target.value)
+          }
+          placeholder="Description"
+        />
 
+        <div className="flex-1 relative min-w-[200px]">
           <Button
-            component="label"
-            variant="outlined"
-            startIcon={<UploadFileIcon />}
+            variant="outline"
+            className="w-full justify-start whitespace-nowrap overflow-hidden text-ellipsis px-4"
             disabled={!row.editable}
-            sx={{
-              borderRadius: "16px",
-              px: 2.5,
-              py: 1.4,
-              minWidth: 210,
-              textTransform: "none",
-              fontWeight: 700,
-            }}
+            asChild
           >
-            {row.file
-              ? typeof row.file === "string"
-                ? row.file.split("/").pop()
-                : row.file.name
-              : "Upload File"}
+            <label className="cursor-pointer font-normal flex items-center">
+              <Upload className="w-4 h-4 mr-2 shrink-0 text-muted-foreground" />
+              <span className="truncate">
+                {row.file
+                  ? typeof row.file === "string"
+                    ? row.file.split("/").pop()
+                    : row.file.name
+                  : "Upload File"}
+              </span>
+              <input
+                className="hidden"
+                type="file"
+                disabled={!row.editable}
+                accept={
+                  type === "bim"
+                    ? ".rvt,.ifc,.dwg,.nwd,.nwc"
+                    : ".e57,.las,.laz,.pts,.xyz,.ply"
+                }
+                onChange={(e) =>
+                  updateRow(type, row.id, "file", e.target.files[0])
+                }
+              />
+            </label>
+          </Button>
+        </div>
 
-            <input
-              hidden
-              type="file"
-              accept={
-                type === "bim"
-                  ? ".rvt,.ifc,.dwg,.nwd,.nwc"
-                  : ".e57,.las,.laz,.pts,.xyz,.ply"
-              }
-              onChange={(e) =>
-                updateRow(type, row.id, "file", e.target.files[0])
-              }
-            />
+        <Input
+          className="w-full md:w-40 shrink-0"
+          type="date"
+          disabled={!row.editable}
+          value={row.date}
+          onChange={(e) => updateRow(type, row.id, "date", e.target.value)}
+        />
+
+        <div className="flex gap-2 shrink-0">
+          <Button
+            size="icon"
+            onClick={() => saveRow(type, row)}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            title="Save"
+          >
+            <Save className="w-4 h-4" />
           </Button>
 
-          <TextField
-            type="date"
-            disabled={!row.editable}
-            value={row.date}
-            onChange={(e) => updateRow(type, row.id, "date", e.target.value)}
-            sx={{
-              width: 180,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "16px",
-                background: "#fff",
-              },
-            }}
-          />
-
-          <IconButton
-            onClick={() => saveRow(type, row)}
-            sx={{
-              background: "#1976d2",
-              color: "#fff",
-              width: 50,
-              height: 50,
-              "&:hover": { background: "#125bb5" },
-            }}
-          >
-            <SaveIcon />
-          </IconButton>
-
-          <IconButton
+          <Button
+            size="icon"
+            variant="outline"
             onClick={() => toggleEdit(type, row.id)}
-            sx={{
-              background: "#ff9800",
-              color: "#fff",
-              width: 50,
-              height: 50,
-              "&:hover": { background: "#f57c00" },
-            }}
+            className="border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700"
+            title="Edit"
           >
-            <EditIcon />
-          </IconButton>
+            <Edit2 className="w-4 h-4" />
+          </Button>
 
-          <IconButton
+          <Button
+            size="icon"
+            variant="destructive"
             onClick={() => deleteRow(type, row.id)}
-            sx={{
-              background: "#ef5350",
-              color: "#fff",
-              width: 50,
-              height: 50,
-              "&:hover": { background: "#d32f2f" },
-            }}
+            title="Delete"
           >
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
-      </Paper>
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
     ));
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        p: 4,
-        background: "linear-gradient(135deg,#f5f8ff,#eaf2ff)",
-      }}
-    >
-      <Card
-        sx={{
-          p: 4,
-          mb: 4,
-          borderRadius: "30px",
-          background: "linear-gradient(135deg,#1976d2,#42a5f5)",
-          color: "#fff",
-          boxShadow: "0 15px 40px rgba(25,118,210,0.35)",
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold">
-          {projectName}
-        </Typography>
-        <Typography mt={1}>
-          Manage BIM and Point Cloud Data for this project
-        </Typography>
+    <div className="min-h-screen p-6 max-w-7xl mx-auto space-y-6">
+      <Card className="border-0 shadow-md bg-gradient-to-r from-blue-600 to-blue-400 text-primary-foreground">
+        <CardContent className="p-6">
+          <h2 className="text-3xl font-bold tracking-tight mb-2 text-white">
+            {projectName}
+          </h2>
+          <p className="opacity-90 text-blue-50">
+            Manage BIM and Point Cloud Data for this project
+          </p>
+        </CardContent>
       </Card>
 
-      <Card
-        sx={{
-          p: 3,
-          mb: 4,
-          borderRadius: "28px",
-          background: "rgba(255,255,255,0.75)",
-          backdropFilter: "blur(10px)",
-        }}
-      >
-        <Stack direction="row" justifyContent="space-between" mb={3}>
-          <Typography variant="h5" fontWeight="bold">
-            BIM Data
-          </Typography>
-
-          <Button
-            variant="contained"
-            onClick={() => addRow("bim")}
-            sx={{ borderRadius: "14px" }}
-          >
-            Add BIM File
-          </Button>
-        </Stack>
-
-        {renderRows(bimRows, "bim")}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2 bg-slate-50/50 rounded-t-xl border-b mb-4">
+          <CardTitle>BIM Data</CardTitle>
+          <Button onClick={() => addRow("bim")}>Add BIM File</Button>
+        </CardHeader>
+        <CardContent className="pt-2">
+          {bimRows.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-xl">No BIM data available. Click "Add BIM File" to create one.</div>
+          ) : (
+            renderRows(bimRows, "bim")
+          )}
+        </CardContent>
       </Card>
 
-      <Card
-        sx={{
-          p: 3,
-          borderRadius: "28px",
-          background: "rgba(255,255,255,0.75)",
-          backdropFilter: "blur(10px)",
-        }}
-      >
-        <Stack direction="row" justifyContent="space-between" mb={3}>
-          <Typography variant="h5" fontWeight="bold">
-            Point Cloud Data
-          </Typography>
-
-          <Button
-            variant="contained"
-            onClick={() => addRow("point")}
-            sx={{ borderRadius: "14px" }}
-          >
-            Add Point Cloud
-          </Button>
-        </Stack>
-
-        {renderRows(pointRows, "point")}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2 bg-slate-50/50 rounded-t-xl border-b mb-4">
+          <CardTitle>Point Cloud Data</CardTitle>
+          <Button onClick={() => addRow("point")}>Add Point Cloud</Button>
+        </CardHeader>
+        <CardContent className="pt-2">
+          {pointRows.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-xl">No Point Cloud data available. Click "Add Point Cloud" to create one.</div>
+          ) : (
+            renderRows(pointRows, "point")
+          )}
+        </CardContent>
       </Card>
-    </Box>
+    </div>
   );
 }

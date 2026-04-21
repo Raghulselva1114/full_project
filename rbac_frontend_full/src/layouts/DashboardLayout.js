@@ -1,12 +1,9 @@
-import { Box } from "@mui/material";
 import { useLocation, Outlet } from "react-router-dom";
 import Topbar from "./Topbar";
 import Sidebar from "./Sidebar";
 
 export default function DashboardLayout() {
   const location = useLocation();
-  const SIDEBAR_WIDTH = 240;
-  const TOPBAR_HEIGHT = 64;
 
   const sidebarRoutes = [
     "/superadmin",
@@ -23,20 +20,18 @@ export default function DashboardLayout() {
   const showSidebar = sidebarRoutes.includes(location.pathname);
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50">
       <Topbar />
 
       {showSidebar && <Sidebar />}
 
-      <Box
-        sx={{
-          ml: showSidebar ? `${SIDEBAR_WIDTH}px` : 0,
-          pt: `calc(${TOPBAR_HEIGHT}px + 16px)`,
-          px: 2,
-        }}
+      <main 
+        className={`pt-20 px-6 pb-6 transition-all duration-300 ${
+          showSidebar ? "ml-60" : "ml-0"
+        }`}
       >
         <Outlet />
-      </Box>
-    </>
+      </main>
+    </div>
   );
 }

@@ -1,29 +1,22 @@
 import { useEffect, useState } from "react";
 import {
-  Box,
-  Typography,
-  TextField,
-  Button,
   Table,
-  TableHead,
-  TableRow,
-  TableCell,
   TableBody,
-  IconButton,
-  Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Edit, Trash2 } from "lucide-react";
 import API from "../../api/axios";
 
 export default function OrganizationManagement() {
   const [orgs, setOrgs] = useState([]);
   const [search, setSearch] = useState("");
 
-  // 🔥 popup state
   const [open, setOpen] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState(null);
   const [newName, setNewName] = useState("");
@@ -37,7 +30,6 @@ export default function OrganizationManagement() {
     fetchOrgs();
   }, []);
 
-  // ❌ DELETE
   const deleteOrg = async (id) => {
     if (!window.confirm("Delete this organization?")) return;
 
@@ -45,14 +37,12 @@ export default function OrganizationManagement() {
     fetchOrgs();
   };
 
-  // ✏️ OPEN EDIT
   const handleEdit = (org) => {
     setSelectedOrg(org);
     setNewName(org.organization_name);
     setOpen(true);
   };
 
-  // 💾 SAVE EDIT
   const updateOrg = async () => {
     await API.put(`organizations/${selectedOrg.id}/update/`, {
       organization_name: newName,
@@ -63,39 +53,27 @@ export default function OrganizationManagement() {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <Typography variant="h5">Organization Management</Typography>
-      </Box>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold tracking-tight">Organization Management</h2>
+      </div>
 
-      {/* SEARCH */}
-      <TextField
-        fullWidth
+      <Input
         placeholder="Search..."
-        sx={{ mb: 3 }}
+        className="max-w-md"
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* TABLE */}
-      <Paper>
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableCell>
-                <b>Organization</b>
-              </TableCell>
-              <TableCell>
-                <b>User</b>
-              </TableCell>
-              <TableCell>
-                <b>Joined Date</b>
-              </TableCell>
-              <TableCell>
-                <b>Actions</b>
-              </TableCell>
+              <TableHead className="font-bold">Organization</TableHead>
+              <TableHead className="font-bold">User</TableHead>
+              <TableHead className="font-bold">Joined Date</TableHead>
+              <TableHead className="font-bold text-right">Actions</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
 
           <TableBody>
             {orgs
@@ -106,7 +84,7 @@ export default function OrganizationManagement() {
               )
               .map((org) => (
                 <TableRow key={org.id}>
-                  <TableCell>{org.organization_name}</TableCell>
+                  <TableCell className="font-medium">{org.organization_name}</TableCell>
                   <TableCell>{org.username}</TableCell>
                   <TableCell>
                     {org.created_at
@@ -114,40 +92,47 @@ export default function OrganizationManagement() {
                       : "-"}
                   </TableCell>
 
-                  <TableCell>
-                    <IconButton onClick={() => handleEdit(org)}>
-                      <Edit />
-                    </IconButton>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(org)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
 
-                    <IconButton onClick={() => deleteOrg(org.id)}>
-                      <Delete />
-                    </IconButton>
+                    <Button variant="ghost" size="icon" onClick={() => deleteOrg(org.id)} className="text-destructive hover:text-destructive">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
+            {orgs.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
-      </Paper>
+      </div>
 
-      {/* 🔥 EDIT POPUP */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Edit Organization</DialogTitle>
-
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <TextField
-            fullWidth
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-          />
-        </DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Organization</DialogTitle>
+          </DialogHeader>
 
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={updateOrg}>
-            Save
-          </Button>
-        </DialogActions>
+          <div className="py-4">
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={updateOrg}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-    </Box>
+    </div>
   );
 }

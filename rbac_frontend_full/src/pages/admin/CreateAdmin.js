@@ -1,23 +1,10 @@
 import { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Card,
-  CardContent,
-  IconButton,
-  InputAdornment,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
-import {
-  Visibility,
-  VisibilityOff,
-  ContentCopy,
-  Apartment,
-} from "@mui/icons-material";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Eye, EyeOff, Copy, Building2 } from "lucide-react";
 import API from "../../api/axios";
 import Topbar from "../../layouts/Topbar";
 
@@ -68,224 +55,116 @@ export default function CreateOrganization() {
     }
   };
 
-  const inputStyle = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "14px",
-      background: "rgba(255,255,255,0.08)",
-      backdropFilter: "blur(10px)",
-      color: "#fff",
-      "& fieldset": {
-        borderColor: "rgba(255,255,255,0.15)",
-      },
-      "&:hover fieldset": {
-        borderColor: "#00c6ff",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#00e5ff",
-        boxShadow: "0 0 15px rgba(0,229,255,0.4)",
-      },
-    },
-    "& .MuiInputLabel-root": {
-      color: "rgba(255,255,255,0.8)",
-    },
-    "& input": {
-      color: "#fff",
-    },
-  };
-
   return (
     <>
       <Topbar />
 
-      <Box
-        sx={{
-          minHeight: "100vh",
-          pt: 12,
-          px: 2,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: `
-            radial-gradient(circle at top left, rgba(0,198,255,0.18), transparent 30%),
-            radial-gradient(circle at bottom right, rgba(0,114,255,0.18), transparent 35%),
-            linear-gradient(135deg, #0f172a, #1e3a8a)
-          `,
-        }}
-      >
-        <Card
-          sx={{
-            width: 470,
-            borderRadius: "28px",
-            overflow: "hidden",
-            backdropFilter: "blur(22px)",
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            boxShadow: `
-              0 20px 60px rgba(0,0,0,0.45),
-              inset 0 1px 0 rgba(255,255,255,0.08)
-            `,
-            position: "relative",
-          }}
-        >
-          <Box
-            sx={{
-              height: 6,
-              background: "linear-gradient(90deg,#00e5ff,#0072ff,#7c3aed)",
-            }}
-          />
+      <div className="min-h-screen pt-24 px-4 flex justify-center items-center bg-slate-50">
+        <Card className="w-full max-w-[470px] shadow-lg border-0 sm:border border-border">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto bg-primary/10 p-4 rounded-full w-20 h-20 flex items-center justify-center mb-4">
+              <Building2 className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">Create Organization</h2>
+            <p className="text-sm text-muted-foreground">Setup a new organization with admin credentials</p>
+          </CardHeader>
 
-          <CardContent sx={{ p: 4 }}>
-            <Box textAlign="center" mb={3}>
-              <Apartment
-                sx={{
-                  fontSize: 44,
-                  color: "#00e5ff",
-                  filter: "drop-shadow(0 0 12px rgba(0,229,255,0.6))",
-                }}
+          <CardContent className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="organization_name">Organization Name</Label>
+              <Input
+                id="organization_name"
+                value={form.organization_name}
+                onChange={(e) => setForm({ ...form, organization_name: e.target.value })}
               />
+            </div>
 
-              <Typography
-                variant="h4"
-                fontWeight="bold"
-                sx={{
-                  mt: 1,
-                  background: "linear-gradient(45deg,#ffffff,#cbd5e1)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Create Organization
-              </Typography>
+            <div className="space-y-2">
+              <Label htmlFor="username">Admin Username</Label>
+              <Input
+                id="username"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+              />
+            </div>
 
-              <Typography
-                variant="body2"
-                sx={{ color: "rgba(255,255,255,0.65)", mt: 1 }}
-              >
-                Setup a new organization with admin credentials
-              </Typography>
-            </Box>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
 
-            <TextField
-              fullWidth
-              label="Organization Name"
-              margin="normal"
-              sx={inputStyle}
-              onChange={(e) =>
-                setForm({ ...form, organization_name: e.target.value })
-              }
-            />
-
-            <TextField
-              fullWidth
-              label="Admin Username"
-              margin="normal"
-              sx={inputStyle}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              margin="normal"
-              sx={inputStyle}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      sx={{ color: "#00e5ff" }}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              type="password"
-              margin="normal"
-              sx={inputStyle}
-              value={form.confirmPassword}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  confirmPassword: e.target.value,
-                })
-              }
-            />
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={form.confirmPassword}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    confirmPassword: e.target.value,
+                  })
+                }
+              />
+            </div>
 
             <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 4,
-                py: 1.6,
-                fontWeight: "bold",
-                fontSize: "1rem",
-                borderRadius: "14px",
-                background: "linear-gradient(135deg,#00c6ff,#0072ff)",
-                boxShadow: "0 10px 30px rgba(0,114,255,0.45)",
-                transition: "0.3s",
-                "&:hover": {
-                  transform: "translateY(-3px)",
-                  boxShadow: "0 14px 35px rgba(0,114,255,0.6)",
-                },
-              }}
+              className="w-full mt-4 py-6 text-base"
               onClick={createOrg}
             >
               CREATE ORGANIZATION 🚀
             </Button>
           </CardContent>
         </Card>
-      </Box>
+      </div>
 
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: "20px",
-            background: "linear-gradient(135deg,#0f172a,#1e293b)",
-            color: "#fff",
-            minWidth: 400,
-            border: "1px solid rgba(255,255,255,0.1)",
-          },
-        }}
-      >
-        <DialogTitle>🎉 Organization Created Successfully!</DialogTitle>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              🎉 Organization Created Successfully!
+            </DialogTitle>
+          </DialogHeader>
 
-        <DialogContent>
-          <Typography mb={1}>
-            <b>Organization:</b> {form.organization_name}
-          </Typography>
-          <Typography mb={1}>
-            <b>Username:</b> {form.username}
-          </Typography>
-          <Typography mb={2}>
-            <b>Password:</b> {form.password}
-          </Typography>
+          <div className="space-y-3 py-4">
+            <div className="text-sm">
+              <span className="font-semibold px-2">Organization:</span> 
+              <span className="text-muted-foreground">{form.organization_name}</span>
+            </div>
+            <div className="text-sm">
+              <span className="font-semibold px-2">Username:</span> 
+              <span className="text-muted-foreground">{form.username}</span>
+            </div>
+            <div className="text-sm">
+              <span className="font-semibold px-2">Password:</span> 
+              <span className="text-muted-foreground">{form.password}</span>
+            </div>
+          </div>
 
-          <Button
-            fullWidth
-            startIcon={<ContentCopy />}
-            onClick={copyCredentials}
-            sx={{
-              background: "linear-gradient(135deg,#00c6ff,#0072ff)",
-              color: "#fff",
-              borderRadius: "12px",
-              "&:hover": {
-                background: "linear-gradient(135deg,#00b4ff,#005eff)",
-              },
-            }}
-          >
-            Copy Credentials
-          </Button>
+          <DialogFooter>
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={copyCredentials}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copy Credentials
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

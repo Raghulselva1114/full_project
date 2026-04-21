@@ -1,16 +1,9 @@
 import { useState } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Snackbar,
-  Alert,
-} from "@mui/material";
 import API from "../../api/axios";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function ProjectSetup() {
   const [projectForm, setProjectForm] = useState({
@@ -21,33 +14,28 @@ export default function ProjectSetup() {
   });
 
   const [loadingProject, setLoadingProject] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  // 🔹 HANDLERS
   const handleProjectChange = (field) => (e) => {
     setProjectForm({ ...projectForm, [field]: e.target.value });
   };
 
-  // 🚀 CREATE PROJECT
   const handleCreateProject = async () => {
     if (loadingProject) return;
 
     if (!projectForm.projectName) {
-      setSnackbar({
-        open: true,
-        message: "Project name is required ❌",
-        severity: "error",
-      });
+      setMessage({ type: "error", text: "Project name is required ❌" });
+      return;
+    }
+
+    if (!projectForm.startDate || !projectForm.endDate) {
+      setMessage({ type: "warning", text: "Start Date and End Date are required ⚠️" });
       return;
     }
 
     try {
       setLoadingProject(true);
+      setMessage(null);
 
       await API.post(
         "create-project/",
@@ -64,11 +52,7 @@ export default function ProjectSetup() {
         },
       );
 
-      setSnackbar({
-        open: true,
-        message: "Project Created Successfully ✅",
-        severity: "success",
-      });
+      setMessage({ type: "success", text: "Project Created Successfully ✅" });
 
       setProjectForm({
         projectName: "",
@@ -76,11 +60,12 @@ export default function ProjectSetup() {
         startDate: "",
         endDate: "",
       });
+      
+      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      setSnackbar({
-        open: true,
-        message: err.response?.data?.detail || "Error creating project ❌",
-        severity: "error",
+      setMessage({
+        type: "error",
+        text: err.response?.data?.detail || "Error creating project ❌",
       });
     } finally {
       setLoadingProject(false);
@@ -88,85 +73,73 @@ export default function ProjectSetup() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #e3f2fd, #ffffff)",
-        p: 2,
-      }}
-    >
-      <Grid container spacing={3} maxWidth={500}>
-        {/* CREATE PROJECT */}
-        <Grid item xs={12}>
-          <Card sx={{ p: 3, borderRadius: 4 }}>
-            <CardContent>
-              <Typography variant="h6" mb={2} fontWeight="bold">
-                Create Project
-              </Typography>
+    <div className="w-full max-w-lg mx-auto py-8">
+      <Card className="shadow-md border-0 sm:border sm:border-border">
+        <CardHeader>
+          <CardTitle>Create Project</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {message && (
+            <div
+              className={`mb-4 px-4 py-3 rounded-md text-sm font-medium ${
+                message.type === "error"
+                  ? "bg-destructive/10 text-destructive"
+                  : "bg-green-100 text-green-800"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
 
-              <TextField
-                fullWidth
-                label="Project Name"
-                margin="normal"
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectName">Project Name</Label>
+              <Input
+                id="projectName"
                 value={projectForm.projectName}
                 onChange={handleProjectChange("projectName")}
               />
+            </div>
 
-              <TextField
-                fullWidth
-                label="Description"
-                margin="normal"
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
                 value={projectForm.description}
                 onChange={handleProjectChange("description")}
               />
+            </div>
 
-              <TextField
-                fullWidth
-                label="Start Date"
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
                 type="date"
-                margin="normal"
-                InputLabelProps={{ shrink: true }}
                 value={projectForm.startDate}
                 onChange={handleProjectChange("startDate")}
               />
+            </div>
 
-              <TextField
-                fullWidth
-                label="End Date"
+            <div className="space-y-2">
+              <Label htmlFor="endDate">End Date</Label>
+              <Input
+                id="endDate"
                 type="date"
-                margin="normal"
-                InputLabelProps={{ shrink: true }}
                 value={projectForm.endDate}
                 onChange={handleProjectChange("endDate")}
               />
+            </div>
 
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{ mt: 2, borderRadius: 5 }}
-                onClick={handleCreateProject}
-                disabled={loadingProject}
-              >
-                {loadingProject ? "Creating..." : "Create Project"}
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* 🔥 SNACKBAR */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert severity={snackbar.severity} variant="filled">
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+            <Button
+              className="w-full mt-2"
+              onClick={handleCreateProject}
+              disabled={loadingProject}
+            >
+              {loadingProject ? "Creating..." : "Create Project"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

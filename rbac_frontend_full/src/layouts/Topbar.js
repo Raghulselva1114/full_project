@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function Topbar() {
   const navigate = useNavigate();
@@ -8,40 +8,22 @@ export default function Topbar() {
 
   const logout = () => {
     localStorage.clear();
-    navigate("/login", { replace: true }); // 🔥 better
+    navigate("/login", { replace: true });
   };
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        width: "100%", // 🔥 FULL WIDTH
-        left: 0, // 🔥 RESET POSITION
-        background: "linear-gradient(90deg, #0f2027, #203a43, #2c5364)", // 🔥 3D look
-        boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-      }}
-    >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* LEFT */}
-        <Typography fontWeight="bold" sx={{ letterSpacing: 1 }}>
+    <header className="fixed top-0 left-0 w-full h-16 bg-background border-b z-50 shadow-sm flex items-center justify-between px-6">
+      <div className="flex items-center space-x-2">
+        <h1 className="font-bold text-lg tracking-wide text-foreground">
           🚀 DSTRI ({role})
-        </Typography>
+        </h1>
+      </div>
 
-        {/* RIGHT */}
-        <Box>
-          <Button
-            color="inherit"
-            onClick={logout}
-            sx={{
-              border: "1px solid white",
-              borderRadius: 2,
-              px: 2,
-            }}
-          >
-            Logout
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
+      <div>
+        <Button variant="outline" onClick={logout}>
+          Logout
+        </Button>
+      </div>
+    </header>
   );
 }

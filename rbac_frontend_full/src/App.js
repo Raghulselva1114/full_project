@@ -32,6 +32,8 @@ import DataDashboard from "./pages/roles/DataDashboard";
 
 import ProjectDetailsPage from "./pages/roles/ProjectDetailsPage";
 
+import ViewerPage from "./pages/viewer/ViewerPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -69,6 +71,9 @@ export default function App() {
           <Route path="/engineer" element={<EngineerDashboard />} />
           <Route path="/data" element={<DataDashboard />} />
           <Route path="/project-details/:id" element={<ProjectDetailsPage />} />
+          
+          {/* 3D Viewer */}
+          <Route path="/viewer/:id" element={<ViewerPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

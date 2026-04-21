@@ -42,7 +42,8 @@ class CreateProjectUserView(APIView):
                 username=username,
                 password=password
             )
-
+            
+            user.role = "member"       # ✅ required field
             user.sub_role = sub_role   # ✅ correct field
             user.is_active = True  
             user.save()                # 🔥 MUST
@@ -69,7 +70,11 @@ class CreateUserAssignProjectView(APIView):
             sub_role = request.data.get("sub_role")
 
             if not username or not password or not sub_role:
-                return Response({"error": "Missing required fields"}, status=400)
+                return Response({"error": "Missing required fields: username, password, and sub_role are required"}, status=400)
+
+            # Check if username already exists
+            if User.objects.filter(username=username).exists():
+                return Response({"error": "Username already exists"}, status=400)
 
             # ✅ FIX HERE
             user = User.objects.create_user(
@@ -77,6 +82,7 @@ class CreateUserAssignProjectView(APIView):
                 password=password
             )
 
+            user.role = "member"       # 🔥 required field
             user.sub_role = sub_role   # 🔥 correct field
             user.is_active = True  
             user.save()                # 🔥 MUST
@@ -98,11 +104,14 @@ class CreateProjectView(APIView):
         try:
             project_name = request.data.get("project_name")
             description = request.data.get("description")
-            start = request.data.get("start")
-            end = request.data.get("end")
+            # Accept both field names for compatibility
+            start = request.data.get("start") or request.data.get("start_date")
+            end = request.data.get("end") or request.data.get("end_date")
 
             if not project_name:
                 return Response({"error": "Project name required"}, status=400)
+            if not start or not end:
+                return Response({"error": "Start date and End date are required"}, status=400)
 
             project = Project.objects.create(
                  project_name=project_name,
