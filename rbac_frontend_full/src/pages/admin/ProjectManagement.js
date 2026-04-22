@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Edit, Trash2, UserPlus, X } from "lucide-react";
 import API from "../../api/axios";
 
@@ -29,7 +35,7 @@ export default function ProjectManagement() {
   const [roleOpen, setRoleOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
-  
+
   const navigate = useNavigate();
 
   const fetchProjects = async () => {
@@ -116,14 +122,19 @@ export default function ProjectManagement() {
   };
 
   const handleUserSelect = (e) => {
-    const options = Array.from(e.target.selectedOptions, option => option.value);
+    const options = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value,
+    );
     setSelectedUsers(options);
   };
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold tracking-tight">Project Management</h2>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Project Management
+        </h2>
       </div>
 
       <Input
@@ -153,7 +164,7 @@ export default function ProjectManagement() {
                 d.project_name?.toLowerCase().includes(search.toLowerCase()),
               )
               .map((row) => (
-                <TableRow 
+                <TableRow
                   key={row.id}
                   onClick={() => navigate(`/viewer/${row.id}`)}
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -164,7 +175,11 @@ export default function ProjectManagement() {
                       className="cursor-pointer inline-flex items-center justify-center w-12 h-12 rounded-md bg-muted border-2 border-dashed border-muted-foreground/25 overflow-hidden"
                     >
                       {row.image ? (
-                        <img src={row.image} alt={row.project_name} className="w-full h-full object-cover" />
+                        <img
+                          src={row.image}
+                          alt={row.project_name}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <span className="text-muted-foreground">+</span>
                       )}
@@ -177,12 +192,14 @@ export default function ProjectManagement() {
                     </label>
                   </TableCell>
 
-                  <TableCell className="font-medium">{row.project_name}</TableCell>
+                  <TableCell className="font-medium">
+                    {row.project_name}
+                  </TableCell>
 
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                    {row.users?.length > 0
-                      ? row.users.map((u) => (
+                      {row.users?.length > 0 ? (
+                        row.users.map((u) => (
                           <div
                             key={u.id}
                             onClick={(e) => {
@@ -195,7 +212,6 @@ export default function ProjectManagement() {
                           >
                             <span>{u.username}</span>
                             <div
-                              role="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (window.confirm("Remove user?")) {
@@ -208,30 +224,33 @@ export default function ProjectManagement() {
                             </div>
                           </div>
                         ))
-                      : <span className="text-muted-foreground">-</span>}
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </div>
                   </TableCell>
 
-                  <TableCell className="max-w-[150px] truncate">{row.description}</TableCell>
+                  <TableCell className="max-w-[150px] truncate">
+                    {row.description}
+                  </TableCell>
                   <TableCell>{row.start}</TableCell>
                   <TableCell>{row.end}</TableCell>
 
                   <TableCell className="text-right whitespace-nowrap">
                     <Button
-                      variant="ghost" 
+                      variant="ghost"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditData(row);
                         setEditOpen(true);
                       }}
-                      title="Edit Project"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
 
                     <Button
-                      variant="ghost" 
+                      variant="ghost"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -239,33 +258,31 @@ export default function ProjectManagement() {
                         setAssignOpen(true);
                       }}
                       className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                      title="Assign User"
                     >
                       <UserPlus className="w-4 h-4" />
                     </Button>
 
                     <Button
-                      variant="ghost" 
+                      variant="ghost"
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteProject(row.id);
-                      }} 
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      title="Delete Project"
+                      }}
+                      className="text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
               ))}
-              {data.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
+            {data.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
@@ -291,7 +308,9 @@ export default function ProjectManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={updateProject}>Update</Button>
           </DialogFooter>
         </DialogContent>
@@ -305,12 +324,15 @@ export default function ProjectManagement() {
           </DialogHeader>
           <div className="py-4 space-y-4">
             <p className="text-sm">
-              Project: <span className="font-bold">{selectedProject?.project_name}</span>
+              Project:{" "}
+              <span className="font-bold">{selectedProject?.project_name}</span>
             </p>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Users (Hold Ctrl/Cmd to select multiple)</label>
-              <select 
+              <label className="text-sm font-medium">
+                Select Users (Hold Ctrl/Cmd to select multiple)
+              </label>
+              <select
                 multiple
                 value={selectedUsers}
                 onChange={handleUserSelect}
@@ -325,7 +347,9 @@ export default function ProjectManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAssignOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAssignOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={assignUserToProject}>Assign</Button>
           </DialogFooter>
         </DialogContent>
@@ -356,7 +380,9 @@ export default function ProjectManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRoleOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setRoleOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={updateUserRole}>Update</Button>
           </DialogFooter>
         </DialogContent>

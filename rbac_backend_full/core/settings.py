@@ -39,9 +39,9 @@ MIDDLEWARE = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rbac',
+        'NAME': 'dstri_db',
         'USER': 'root',
-        'PASSWORD': 'Drsti@2026',
+        'PASSWORD': '2000',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
