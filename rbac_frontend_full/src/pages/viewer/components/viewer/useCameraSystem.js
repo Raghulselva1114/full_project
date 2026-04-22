@@ -1017,6 +1017,7 @@ export default function useCameraSystem(sceneData, modelData, props) {
 
         const geo = new THREE.ConeGeometry(0.3, 0.5, 4);
         geo.rotateX(-Math.PI / 2);
+        geo.rotateY(Math.PI);
 
         const mat = new THREE.MeshStandardMaterial({
           color: posData.isManual ? 0x06b6d4 : imageUrl ? 0x8b5cf6 : 0xf97316,
@@ -1291,6 +1292,7 @@ export default function useCameraSystem(sceneData, modelData, props) {
 
     const geo = new THREE.ConeGeometry(1, 2, 4);
     geo.rotateX(-Math.PI / 2);
+    geo.rotateY(Math.PI);
     const marker = new THREE.Mesh(
       geo,
       new THREE.MeshStandardMaterial({ color: 0x06b6d4 }),
