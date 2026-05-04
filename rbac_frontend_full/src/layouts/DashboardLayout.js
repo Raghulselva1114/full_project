@@ -9,12 +9,16 @@ export default function DashboardLayout() {
     "/superadmin",
     "/superadmin/create-admin",
     "/organizations",
+    "/profile",
 
     "/admin",
     "/admin/projects",
     "/admin/project-management",
     "/admin/project-user",
     "/admin/users",
+    "/manager",
+    "/engineer",
+    "/data",
   ];
 
   const showSidebar = sidebarRoutes.includes(location.pathname);

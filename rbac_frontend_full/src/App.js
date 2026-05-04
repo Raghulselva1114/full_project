@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 // Auth
 import Login from "./pages/auth/Login";
@@ -14,6 +15,7 @@ import Projects from "./pages/admin/Projects";
 import CreateProjectUser from "./pages/admin/CreateProjectUser";
 import ProjectManagement from "./pages/admin/ProjectManagement";
 import Users from "./pages/admin/Users";
+import AdminProfile from "./pages/admin/Profile";
 
 // Member
 import MemberDashboard from "./pages/member/Dashboard";
@@ -59,6 +61,8 @@ export default function App() {
             element={<ProjectManagement />}
           />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/profile" element={<AdminProfile />} />
+          <Route path="/admin/profile" element={<Navigate to="/profile" replace />} />
 
           {/* Member */}
           <Route path="/member/dashboard" element={<MemberDashboard />} />

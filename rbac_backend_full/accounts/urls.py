@@ -8,7 +8,9 @@ from .views import (
     CreateUserView,
     OrganizationListView,
     DeleteOrganizationView,
-    UpdateOrganizationView 
+    UpdateOrganizationView,
+    ProfileView,
+    ProfileUpdateView,
 )
 
 urlpatterns = [
@@ -23,5 +25,7 @@ urlpatterns = [
     path('create-admin/', CreateAdminView.as_view()),
     path('create-member/', CreateMemberView.as_view()),
     path('create-user/', CreateUserView.as_view()),
+    path("profile/", ProfileView.as_view()),
+    path("profile/update/", ProfileUpdateView.as_view()),
    
 ]
