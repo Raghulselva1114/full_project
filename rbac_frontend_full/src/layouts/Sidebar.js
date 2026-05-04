@@ -1,5 +1,12 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Building2, Briefcase, FolderOpen, Users, LayoutDashboard } from "lucide-react";
+import {
+  Building2,
+  Briefcase,
+  FolderOpen,
+  Users,
+  LayoutDashboard,
+  UserCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Sidebar() {
@@ -10,6 +17,11 @@ export default function Sidebar() {
 
   const menuItems = {
     superadmin: [
+      {
+        label: "Profile",
+        path: "/profile",
+        icon: <UserCircle2 className="w-5 h-5" />,
+      },
       {
         label: "Create Organization",
         path: "/superadmin",
@@ -24,6 +36,11 @@ export default function Sidebar() {
 
     admin: [
       {
+        label: "Profile",
+        path: "/profile",
+        icon: <UserCircle2 className="w-5 h-5" />,
+      },
+      {
         label: "Project Setup",
         path: "/admin/projects",
         icon: <FolderOpen className="w-5 h-5" />,
@@ -36,6 +53,42 @@ export default function Sidebar() {
       {
         label: "Project Management",
         path: "/admin/project-management",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+      },
+    ],
+    project_manager: [
+      {
+        label: "Profile",
+        path: "/profile",
+        icon: <UserCircle2 className="w-5 h-5" />,
+      },
+      {
+        label: "Dashboard",
+        path: "/manager",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+      },
+    ],
+    project_engineer: [
+      {
+        label: "Profile",
+        path: "/profile",
+        icon: <UserCircle2 className="w-5 h-5" />,
+      },
+      {
+        label: "Dashboard",
+        path: "/engineer",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+      },
+    ],
+    data_contributor: [
+      {
+        label: "Profile",
+        path: "/profile",
+        icon: <UserCircle2 className="w-5 h-5" />,
+      },
+      {
+        label: "Dashboard",
+        path: "/data",
         icon: <LayoutDashboard className="w-5 h-5" />,
       },
     ],

@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from django.contrib.auth import authenticate
 from .models import User
 from .serializers import SignupSerializer
@@ -193,3 +195,82 @@ class UpdateOrganizationView(APIView):
             return Response({"message": "Updated ✅"})
         except Organization.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        avatar_url = ""
+        if getattr(user, "avatar", None) and user.avatar:
+            avatar_url = request.build_absolute_uri(user.avatar.url)
+        return Response(
+            {
+                "first_name": user.first_name or "",
+                "last_name": user.last_name or "",
+                "bio": user.bio or "",
+                "username": user.username,
+                "role": user.role or "",
+                "sub_role": user.sub_role or "",
+                "avatar_url": avatar_url,
+            }
+        )
+
+
+class ProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+
+    def put(self, request):
+        try:
+            user = request.user
+
+            first_name = request.data.get("first_name", "").strip()
+            last_name = request.data.get("last_name", "").strip()
+            bio = request.data.get("bio", "").strip()
+            password = request.data.get("password", "")
+
+            if not first_name or not last_name:
+                return Response(
+                    {"error": "First name and last name are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user.first_name = first_name
+            user.last_name = last_name
+            user.bio = bio
+            if password:
+                user.set_password(password)
+
+            uploaded = request.FILES.get("avatar")
+            if uploaded:
+                if not uploaded.content_type or not uploaded.content_type.startswith("image/"):
+                    return Response(
+                        {"error": "Avatar must be an image file."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                user.avatar = uploaded
+
+            user.save()
+
+            avatar_url = ""
+            if user.avatar:
+                avatar_url = request.build_absolute_uri(user.avatar.url)
+
+            response_data = {
+                "message": "Profile updated successfully.",
+                "avatar_url": avatar_url,
+            }
+
+            if password:
+                refresh = RefreshToken.for_user(user)
+                response_data["access"] = str(refresh.access_token)
+                response_data["refresh"] = str(refresh)
+
+            return Response(response_data)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

@@ -21,6 +21,8 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=30, choices=ROLE_CHOICES)
     sub_role = models.CharField(max_length=50, null=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to="profile_avatars/", blank=True, null=True)
 
     organization = models.ForeignKey(
         Organization,
